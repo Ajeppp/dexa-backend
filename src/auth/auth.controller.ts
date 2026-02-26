@@ -11,7 +11,7 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: Record<string, any>) {
-    const role = body.role || 'user'; // Default role is 'user' if not provided
+    const role = body.role || 'admin'; // Default role is 'user' if not provided
     const user = await this.usersService.create(
       body.username,
       body.password,

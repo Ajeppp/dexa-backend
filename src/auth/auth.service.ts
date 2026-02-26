@@ -10,13 +10,17 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(username: string, password: string) {
+  async login(username: string, pass: string) {
     const user = await this.usersService.findOne(username);
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!user) {
+      throw new UnauthorizedException('Username atau password salah');
+    }
 
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+    const isMatch = await bcrypt.compare(pass, user.password);
+
+    if (!isMatch) {
+      throw new UnauthorizedException('Username atau password salah');
     }
 
     const payload = { username: user.username, sub: user.id, role: user.role };
