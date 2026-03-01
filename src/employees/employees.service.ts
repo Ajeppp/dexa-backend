@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Employee } from './entities/employee.entity';
@@ -12,6 +12,10 @@ export class EmployeesService {
 
   async findByUserId(userId: number): Promise<Employee | null> {
     return this.employeesRepository.findOne({ where: { user_id: userId } });
+  }
+
+  async findAll(): Promise<Employee[]> {
+    return this.employeesRepository.find();
   }
 
   async create(
@@ -29,5 +33,25 @@ export class EmployeesService {
       department,
     });
     return this.employeesRepository.save(newEmployee);
+  }
+
+  async update(id: number, updateData: any): Promise<Employee> {
+    const employee = await this.employeesRepository.findOne({ where: { id } });
+    if (!employee) {
+      throw new NotFoundException(`Karyawan dengan ID ${id} tidak ditemukan.`);
+    }
+
+    Object.assign(employee, updateData);
+    return this.employeesRepository.save(employee);
+  }
+
+  async remove(id: number): Promise<{ message: string }> {
+    const employee = await this.employeesRepository.findOne({ where: { id } });
+    if (!employee) {
+      throw new NotFoundException(`Karyawan dengan ID ${id} tidak ditemukan.`);
+    }
+
+    await this.employeesRepository.delete(id);
+    return { message: `Data karyawan ${employee.full_name} berhasil dihapus.` };
   }
 }

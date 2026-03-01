@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Employee } from 'src/employees/entities/employee.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity('attendances')
 export class Attendance {
@@ -9,9 +16,16 @@ export class Attendance {
   @Column()
   employee_id: number;
 
-  // Catch date & time
+  // Clock In Time
   @Column()
   check_in_time: Date;
+
+  // Clock Out Time
+  @Column({ nullable: true })
+  check_out_time: Date;
+
+  @Column({ type: 'text', nullable: true })
+  check_out_image_url: string;
 
   // Save Image URL from Cloudinary
   @Column('text')
@@ -19,4 +33,8 @@ export class Attendance {
 
   @Column({ default: 'WFH' })
   status: string;
+
+  @ManyToOne(() => Employee)
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
 }

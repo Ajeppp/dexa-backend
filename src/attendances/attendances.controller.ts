@@ -6,6 +6,9 @@ import {
   BadRequestException,
   UseGuards,
   Request,
+  Get,
+  ForbiddenException,
+  Patch,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AttendancesService } from './attendances.service';
@@ -29,5 +32,26 @@ export class AttendancesController {
     const employeeId = req.user.userId;
 
     return this.attendancesService.checkIn(employeeId, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('check-out')
+  @UseInterceptors(FileInterceptor('image'))
+  async checkOut(
+    @UploadedFile() file: Express.Multer.File,
+    @Request() req: any,
+  ) {
+    const employeeId = req.user.userId;
+
+    return this.attendancesService.checkOut(employeeId, file);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get()
+  async findAll(@Request() req: any) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Unauthorized User!');
+    }
+    return this.attendancesService.findAll();
   }
 }
