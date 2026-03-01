@@ -14,6 +14,7 @@ export class CloudinaryService {
 
   uploadImage(file: Express.Multer.File): Promise<any> {
     return new Promise((resolve, reject) => {
+      //create upload stream to folder dexa_attendance in cloudinary
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: 'dexa_attendance',

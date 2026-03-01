@@ -1,11 +1,11 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('users') // Ini memberitahu TypeORM untuk nge-link ke tabel 'users' di MySQL
+@Entity('users') // link to 'users' tabel in MySQL
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // 👇 INI DIA YANG DITANGISI SAMA TYPESCRIPT! Pastikan baris ini ada.
+  // username harus unique
   @Column({ unique: true })
   username: string;
 

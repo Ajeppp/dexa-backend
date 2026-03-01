@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AttendancesModule } from './attendances/attendances.module';
 import { CloudinaryService } from './cloudinary/cloudinary.service';
+import { EmployeesModule } from './employees/employees.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { CloudinaryService } from './cloudinary/cloudinary.service';
     AuthModule,
     UsersModule,
     AttendancesModule,
+    EmployeesModule,
   ],
   controllers: [AppController],
   providers: [AppService, CloudinaryService],

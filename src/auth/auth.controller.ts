@@ -11,11 +11,16 @@ export class AuthController {
 
   @Post('register')
   async register(@Body() body: Record<string, any>) {
-    const role = body.role || 'admin'; // Default role is 'user' if not provided
-    const user = await this.usersService.create(
+    const role = body.role || 'employee';
+
+    return this.usersService.create(
       body.username,
       body.password,
       role,
+      body.nik,
+      body.full_name,
+      body.position || 'Staff',
+      body.department || 'General',
     );
   }
 

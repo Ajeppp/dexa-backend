@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Attendance } from './entities/attendances.entity';
-import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 import { Repository } from 'typeorm';
+import { Attendance } from './entities/attendances.entity';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+import { EmployeesService } from '../employees/employees.service';
 
 @Injectable()
 export class AttendancesService {
@@ -10,28 +15,37 @@ export class AttendancesService {
     @InjectRepository(Attendance)
     private attendancesRepository: Repository<Attendance>,
     private cloudinaryService: CloudinaryService,
+    private employeesService: EmployeesService,
   ) {}
 
-  async checkIn(employeeId: number, file: Express.Multer.File) {
+  // Parameter yang masuk ke sini adalah userId (angka 5) dari token
+  async checkIn(userId: number, file: Express.Multer.File) {
+    // 1. KITA CARI DULU SIAPA KARYAWAN YANG PUNYA AKUN ID 5 INI
+    const employee = await this.employeesService.findByUserId(userId);
+
+    if (!employee) {
+      throw new NotFoundException(
+        'Profil karyawan tidak ditemukan untuk akun ini.',
+      );
+    }
+
     if (!file) {
       throw new BadRequestException('Foto bukti WFH wajib di-upload!');
     }
 
-    // Upload Image to cloudinary
     const uploadResult = await this.cloudinaryService.uploadImage(file);
 
-    // Get current server time
-    const currentTime = new Date();
-
-    // Prepare data to insert to the database
+    // 2. RAKIT DATA ABSEN
     const newAttendance = this.attendancesRepository.create({
-      employee_id: employeeId,
-      check_in_time: currentTime,
+      // 👇 INI BIANG KEROKNYA KALAU MASIH ERROR!
+      // Harus pakai employee.id (dari hasil pencarian di atas), JANGAN pakai userId!
+      employee_id: employee.id,
+
+      check_in_time: new Date(),
       image_url: uploadResult.secure_url,
       status: 'WFH',
     });
 
-    // Insert to database
     return this.attendancesRepository.save(newAttendance);
   }
 }
