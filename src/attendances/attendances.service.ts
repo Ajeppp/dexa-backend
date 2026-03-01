@@ -105,12 +105,22 @@ export class AttendancesService {
     return this.attendancesRepository.save(todayAttendance);
   }
 
-  async findAll(): Promise<Attendance[]> {
+  async findAll(user: { userId: number; role: string }) {
+    if (user.role === 'admin') {
+      return this.attendancesRepository.find({
+        relations: ['employee'],
+        order: { check_in_time: 'DESC' },
+      });
+    }
+
     return this.attendancesRepository.find({
-      relations: ['employee'],
-      order: {
-        check_in_time: 'DESC',
+      where: {
+        employee: {
+          user_id: user.userId,
+        },
       },
+      relations: ['employee'],
+      order: { check_in_time: 'DESC' },
     });
   }
 }

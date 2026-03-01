@@ -46,12 +46,10 @@ export class AttendancesController {
     return this.attendancesService.checkOut(employeeId, file);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  async findAll(@Request() req: any) {
-    if (req.user.role !== 'admin') {
-      throw new ForbiddenException('Unauthorized User!');
-    }
-    return this.attendancesService.findAll();
+  @UseGuards(JwtAuthGuard)
+  findAll(@Request() req: any) {
+    // 👇 INI KRUSIAL: Kirim objek user (id & role) ke service
+    return this.attendancesService.findAll(req.user);
   }
 }

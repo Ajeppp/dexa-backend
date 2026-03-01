@@ -45,4 +45,10 @@ export class EmployeesController {
     }
     return this.employeesService.remove(Number(id));
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async getMyProfile(@Request() req: any) {
+    return this.employeesService.findByUserId(req.user.userId);
+  }
 }
